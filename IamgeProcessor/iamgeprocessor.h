@@ -1,4 +1,4 @@
-#ifndef IAMGEPROCESSOR_H
+﻿#ifndef IAMGEPROCESSOR_H
 #define IAMGEPROCESSOR_H
 
 #include <QMainWindow>
@@ -7,7 +7,7 @@
 #include <QToolBar>
 #include <QImage>
 #include <QLabel>
-
+#include "imagetransform.h"
 class IamgeProcessor : public QMainWindow
 {
     Q_OBJECT
@@ -23,8 +23,10 @@ private slots:
     void showOpenFile();
     void big();
     void small();
-
+    void showGeometryTransform();
+    void saveFile(); //
 private:
+    imagetransform *gWin;
     QWidget *central;
     QMenu   *fileMenu;
     QToolBar   *fileTool;
@@ -36,6 +38,8 @@ private:
     QAction   *exitAction;
     QAction   *zoombig;
     QAction   *zoomsmall;
+    QAction   *geometryAction;
+    QAction   *savefileAction; //
 
 };
 #endif // IAMGEPROCESSOR_H

@@ -1,8 +1,9 @@
-#include "iamgeprocessor.h"
+﻿#include "iamgeprocessor.h"
 #include <QHBoxLayout>
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QDebug>
+#include "imagetransform.h"
 
 IamgeProcessor::IamgeProcessor(QWidget *parent)
     : QMainWindow(parent)
@@ -12,6 +13,7 @@ IamgeProcessor::IamgeProcessor(QWidget *parent)
     QHBoxLayout *mainLayout=new QHBoxLayout(central);
     imgWin = new QLabel();
     QPixmap      *initPixmap=new QPixmap(300,200);
+    gWin = new imagetransform();
     initPixmap->fill(QColor(255,255,255));
     imgWin->resize(300,200);
     imgWin->setScaledContents(true);
@@ -52,6 +54,17 @@ void IamgeProcessor::createActions() {
     zoomsmall->setStatusTip(QStringLiteral("影像縮小"));
     connect(zoomsmall,SIGNAL(triggered()),this,SLOT(small()));
 
+    geometryAction = new QAction(QStringLiteral("幾何轉換"),this);
+    geometryAction->setShortcut(tr("Ctrl+G"));
+    geometryAction->setStatusTip(QStringLiteral("影像幾何轉換"));
+    connect(geometryAction,SIGNAL(triggered()),this,SLOT(showGeometryTransform()));
+    connect(exitAction,SIGNAL(triggered()),gWin,SLOT(close()));
+
+    savefileAction = new QAction(QStringLiteral("儲存檔案"),this); //
+    savefileAction->setShortcut(tr("Ctrl+V"));
+    savefileAction->setStatusTip(QStringLiteral("儲存影像檔案"));
+    connect(savefileAction,SIGNAL(triggered()),this,SLOT(saveFile()));
+
 }
 
 void IamgeProcessor::big() {
@@ -77,10 +90,12 @@ void IamgeProcessor::small() {
 void IamgeProcessor::createMenus() {
     fileMenu=menuBar()->addMenu(QStringLiteral("檔案&F"));
     fileMenu->addAction(openFileAction);
+    fileMenu->addAction(geometryAction);
     fileMenu->addAction(exitAction);
     fileMenu=menuBar()->addMenu(QStringLiteral("工具&T"));
     fileMenu->addAction(zoombig);
     fileMenu->addAction(zoomsmall);
+
 }
 
 
@@ -91,6 +106,8 @@ void IamgeProcessor::createToolBars() {
     fileTool=addToolBar("zoom");
     fileTool->addAction(zoombig);
     fileTool->addAction(zoomsmall);
+    fileTool->addAction(geometryAction);
+    fileTool->addAction(savefileAction); //
 }
 
 void IamgeProcessor::loadFile(QString filename) {
@@ -117,5 +134,21 @@ void IamgeProcessor::showOpenFile() {
             newIPWin->show();
             newIPWin->loadFile(filename);
         }
+    }
+}
+void IamgeProcessor::showGeometryTransform(){
+    if(!img.isNull())
+    gWin->srcImg=img;
+    gWin->inWin->setPixmap(QPixmap::fromImage(gWin->srcImg));
+    gWin->show();
+}
+
+void IamgeProcessor::saveFile(){ //
+    QString saveFileName = QFileDialog::getSaveFileName(this,
+                          QStringLiteral("儲存影像"),tr("."),
+                          "bmp(*.bmp);;png(*.png)"";;Jpeg(*.jpg)");
+    if(!saveFileName.isEmpty())
+    {
+        img.save(saveFileName);
     }
 }
